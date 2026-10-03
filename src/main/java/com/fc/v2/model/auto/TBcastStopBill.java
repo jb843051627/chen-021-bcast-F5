@@ -31,35 +31,45 @@ public class TBcastStopBill implements Serializable {
     @ApiModelProperty(value = "主键")
     private Long id;
 
-    /** 停播检修核准单 */
+    /** 停播检修核准单代号 */
     @TableField("bill_no")
-    @ApiModelProperty(value = "停播检修核准单")
+    @ApiModelProperty(value = "停播检修核准单代号")
     private String billNo;
 
-    /** 当前所在档口 0..2（台站/市广电局/省局） */
+    /** 同算凭据：核准结果与检修排期名册同一次算落同一凭据 */
+    @TableField("biz_key")
+    @ApiModelProperty(value = "同算凭据：核准结果与排期名册同一次算")
+    private String bizKey;
+
+    /** 当前所在档口 0..2（台站/市广电局/省局）；只由落名出口写定 */
     @TableField("node_no")
-    @ApiModelProperty(value = "当前所在档口 0..2（台站/市广电局/省局）")
+    @ApiModelProperty(value = "当前所在档口 0..2（台站/市广电局/省局）；屏上递的只算意图")
     private Integer nodeNo;
 
-    /** 同档点齐办法 0一笔即可 1两笔点齐 */
+    /** 同档点齐办法（只作展示）0一笔即可 1两笔点齐 */
     @TableField("sign_mode")
-    @ApiModelProperty(value = "同档点齐办法 0一笔即可 1两笔点齐")
+    @ApiModelProperty(value = "同档点齐办法（只作展示）0一笔即可 1两笔点齐")
     private Integer signMode;
 
-    /** 本档应点名数 */
+    /** 本档应点名数（只作展示） */
     @TableField("need_count")
-    @ApiModelProperty(value = "本档应点名数")
+    @ApiModelProperty(value = "本档应点名数（只作展示）")
     private Integer needCount;
 
-    /** 本档已落名数 */
+    /** 本档已落名数（只作展示，以明细表当前趟实点条数为准） */
     @TableField("sign_count")
-    @ApiModelProperty(value = "本档已落名数")
+    @ApiModelProperty(value = "本档已落名数（只作展示）")
     private Integer signCount;
 
-    /** 核准情形 0在核 1已排定 2已挪回 */
+    /** 核准情形 0在核 1已排定 2已了断 */
     @TableField("status")
-    @ApiModelProperty(value = "核准情形 0在核 1已排定 2已挪回")
+    @ApiModelProperty(value = "核准情形 0在核 1已排定 2已了断")
     private Integer status;
+
+    /** 最近一次落名出口动作 */
+    @TableField("last_action")
+    @ApiModelProperty(value = "最近一次落名出口动作")
+    private String lastAction;
 
     /** 删除标记 0正常 1删除 */
     @TableField("del_flag")
@@ -109,6 +119,14 @@ public class TBcastStopBill implements Serializable {
         this.billNo = billNo;
     }
 
+    public String getBizKey() {
+        return bizKey;
+    }
+
+    public void setBizKey(String bizKey) {
+        this.bizKey = bizKey;
+    }
+
     public Integer getNodeNo() {
         return nodeNo;
     }
@@ -147,6 +165,14 @@ public class TBcastStopBill implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getLastAction() {
+        return lastAction;
+    }
+
+    public void setLastAction(String lastAction) {
+        this.lastAction = lastAction;
     }
 
     public Integer getDelFlag() {

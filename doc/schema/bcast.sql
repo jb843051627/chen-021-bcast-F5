@@ -74,12 +74,14 @@ CREATE TABLE IF NOT EXISTS t_bcast_site (
 
 CREATE TABLE IF NOT EXISTS t_bcast_stop_bill (
   id bigint NOT NULL COMMENT '主键',
-  bill_no varchar(64) DEFAULT NULL COMMENT '停播检修核准单',
-  node_no int DEFAULT NULL COMMENT '当前所在档口 0..2（台站/市广电局/省局）',
-  sign_mode int DEFAULT NULL COMMENT '同档点齐办法 0一笔即可 1两笔点齐',
-  need_count int DEFAULT NULL COMMENT '本档应点名数',
-  sign_count int DEFAULT NULL COMMENT '本档已落名数',
-  status int DEFAULT NULL COMMENT '核准情形 0在核 1已排定 2已挪回',
+  bill_no varchar(64) DEFAULT NULL COMMENT '停播检修核准单代号',
+  biz_key varchar(128) DEFAULT NULL COMMENT '同算凭据：核准结果与检修排期名册同一次算落同一凭据，两边对账靠它，不许一处取数一处手填',
+  node_no int DEFAULT NULL COMMENT '当前所在档口 0..2（台站/市广电局/省局）；只由落名出口按已点齐的档数写定，屏上递的只算意图',
+  sign_mode int DEFAULT NULL COMMENT '同档点齐办法（只作展示：真齐没齐以顺单名次数出来的当前趟落名条数为准）0一笔即可 1两笔点齐',
+  need_count int DEFAULT NULL COMMENT '本档应点名数（只作展示：真齐没齐以当前趟落名条数对不对得上应点人数）',
+  sign_count int DEFAULT NULL COMMENT '本档已落名数（只作展示：真齐没齐以明细表当前趟实点条数为准）',
+  status int DEFAULT NULL COMMENT '核准情形 0在核 1已排定 2已了断（被否的单留底，往后各档不得再记名）',
+  last_action varchar(64) DEFAULT NULL COMMENT '最近一次落名出口动作',
   del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
   create_by varchar(64) DEFAULT NULL COMMENT '创建者',
   create_time datetime DEFAULT NULL COMMENT '创建时间',
@@ -88,6 +90,27 @@ CREATE TABLE IF NOT EXISTS t_bcast_stop_bill (
   remark varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='停播检修核准单';
+
+-- 落名明细：顺着核准单的名次一笔一笔记。已记几人不许手填，由这些条数点出来。
+-- round_no 记这是该档第几趟：退一格本档当趟的名当场清零（行保留、打上删除标记留底），
+-- 早先各档的旧名一笔不动；重走另起一趟，新旧两拨分开放，哪日补的各留各的底。
+CREATE TABLE IF NOT EXISTS t_bcast_stop_sign (
+  id bigint NOT NULL COMMENT '主键',
+  bill_id bigint DEFAULT NULL COMMENT '所属停播检修核准单',
+  bill_no varchar(64) DEFAULT NULL COMMENT '所属核准单代号（冗余留底，单上代号变了也能对上旧名）',
+  node_no int DEFAULT NULL COMMENT '落名档口 0台站 1市广电局 2省局',
+  round_no int DEFAULT NULL COMMENT '该档第几趟落名（头一趟为1；退一次重来加一趟）',
+  signer varchar(64) DEFAULT NULL COMMENT '落名人',
+  sign_note varchar(500) DEFAULT NULL COMMENT '落名时留下的话',
+  sign_time datetime DEFAULT NULL COMMENT '落名时刻',
+  del_flag int DEFAULT '0' COMMENT '删除标记 0在册（当前趟）1退档清零留下的底 2否决留底 3再走时压作旧册的上一趟底（老底都照翻，不计当前已记几人）',
+  create_by varchar(64) DEFAULT NULL COMMENT '创建者',
+  create_time datetime DEFAULT NULL COMMENT '创建时间',
+  update_by varchar(64) DEFAULT NULL COMMENT '更新者',
+  update_time datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (id),
+  KEY idx_bill_node_round (bill_id, node_no, round_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='停播检修核准单落名明细';
 
 CREATE TABLE IF NOT EXISTS t_bcast_unit_card (
   id bigint NOT NULL COMMENT '主键',

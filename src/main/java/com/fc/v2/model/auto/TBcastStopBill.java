@@ -56,9 +56,9 @@ public class TBcastStopBill implements Serializable {
     @ApiModelProperty(value = "本档已落名数")
     private Integer signCount;
 
-    /** 核准情形 0在核 1已排定 2已挪回 */
+    /** 核准情形 0在核 1已排定 2已否决 */
     @TableField("status")
-    @ApiModelProperty(value = "核准情形 0在核 1已排定 2已挪回")
+    @ApiModelProperty(value = "核准情形 0在核 1已排定 2已否决")
     private Integer status;
 
     /** 删除标记 0正常 1删除 */

@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS t_bcast_stop_bill (
   sign_mode int DEFAULT NULL COMMENT '同档点齐办法 0一笔即可 1两笔点齐',
   need_count int DEFAULT NULL COMMENT '本档应点名数',
   sign_count int DEFAULT NULL COMMENT '本档已落名数',
-  status int DEFAULT NULL COMMENT '核准情形 0在核 1已排定 2已挪回',
+  status int DEFAULT NULL COMMENT '核准情形 0在核 1已排定 2已否决',
   del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
   create_by varchar(64) DEFAULT NULL COMMENT '创建者',
   create_time datetime DEFAULT NULL COMMENT '创建时间',
@@ -88,6 +88,40 @@ CREATE TABLE IF NOT EXISTS t_bcast_stop_bill (
   remark varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='停播检修核准单';
+
+CREATE TABLE IF NOT EXISTS t_bcast_stop_sign (
+  id bigint NOT NULL COMMENT '主键',
+  bill_id bigint DEFAULT NULL COMMENT '所属核准单主键',
+  bill_no varchar(64) DEFAULT NULL COMMENT '停播检修核准单代号',
+  node_no int DEFAULT NULL COMMENT '落在哪一档 0..2（台站/市广电局/省局）',
+  round_no int DEFAULT NULL COMMENT '这一档走到第几轮（退一回加一轮，头一轮为1）',
+  seq_no int DEFAULT NULL COMMENT '档内名次：这一档这一轮里的第几名',
+  signer varchar(64) DEFAULT NULL COMMENT '落名人',
+  comment varchar(500) DEFAULT NULL COMMENT '落名时记的话',
+  kind int DEFAULT '0' COMMENT '落名种类 0点齐落名 1否决落名',
+  alive_flag int DEFAULT '0' COMMENT '行的情形 0在册作数 1沉底不再作数',
+  del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  create_by varchar(64) DEFAULT NULL COMMENT '创建者',
+  create_time datetime DEFAULT NULL COMMENT '落名时刻',
+  PRIMARY KEY (id),
+  KEY idx_bcast_stop_sign_bill (bill_id, node_no, round_no, alive_flag)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='停播检修核准单落名底账';
+
+CREATE TABLE IF NOT EXISTS t_bcast_stop_schedule (
+  id bigint NOT NULL COMMENT '主键',
+  bill_id bigint DEFAULT NULL COMMENT '所属核准单主键',
+  bill_no varchar(64) DEFAULT NULL COMMENT '停播检修核准单代号',
+  node_no int DEFAULT NULL COMMENT '这一笔原落在哪一档 0..2（台站/市广电局/省局）',
+  round_no int DEFAULT NULL COMMENT '这一档排定时作数的轮次',
+  seq_no int DEFAULT NULL COMMENT '档内名次',
+  signer varchar(64) DEFAULT NULL COMMENT '落名人',
+  sign_id bigint DEFAULT NULL COMMENT '所对的落名底账行主键',
+  del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  create_by varchar(64) DEFAULT NULL COMMENT '誊入名册者',
+  create_time datetime DEFAULT NULL COMMENT '誊入名册时刻',
+  PRIMARY KEY (id),
+  KEY idx_bcast_stop_schedule_bill (bill_id, node_no, seq_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='停播检修排期名册';
 
 CREATE TABLE IF NOT EXISTS t_bcast_unit_card (
   id bigint NOT NULL COMMENT '主键',
